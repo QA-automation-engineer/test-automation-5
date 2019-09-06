@@ -3,6 +3,7 @@ package lesson07.a_explicit_waits_are_good;
 import org.hamcrest.CoreMatchers;
 import org.junit.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -50,6 +51,7 @@ public class MyFirstTest {
                 .sendKeys("T-shirt");
 
         (new WebDriverWait(driver, 10))
+                .ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//*[@id=\"index\"]/div[2]/ul/li[1]"), "T-shirt"));
 
         Assert.assertThat(
