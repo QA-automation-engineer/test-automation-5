@@ -2,3 +2,4 @@ reports/
 .idea/
 target/
 *.iml
+diff*.pdf
