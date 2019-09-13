@@ -33,7 +33,7 @@ public class FirstTest extends BaseTest {
 	}
 
 	@Test
-	public void verifyDownloadMyOrderNegative() throws Exception {
+	public void verifyDownloadMyOrderAreDifferentWithPrevious() throws Exception {
 		// Given
 		LoginPage loginPage = new LoginPage(driver);
 		loginPage.visit();
