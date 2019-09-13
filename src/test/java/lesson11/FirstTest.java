@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 public class FirstTest extends BaseTest {
 
 	@Test
-	public void verifyDownloadMyOrder() throws Exception {
+	public void verifyDownloadMyOrderPositive() throws Exception {
 		// Given
 		LoginPage loginPage = new LoginPage(driver);
 		loginPage.visit();
