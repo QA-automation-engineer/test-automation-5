@@ -11,7 +11,7 @@ public class MyFirstTest extends BaseTest {
     @Test
     public void verifyFirstTipIsCorrectlyUpdatedAfterEnteringNewQuery() {
         LandingPage landingPage = new LandingPage(driver);
-        landingPage.openPage();
+        landingPage.visit();
         String query1 = "Dress";
         String query2 = "T-shirt";
 

@@ -1,7 +1,5 @@
 package pages;
 
-import static utils.Conditions.CLICKABLE;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -15,15 +13,13 @@ public class LandingPage extends BasePage {
         super(driver);
     }
 
-    public void openPage() {
+    public void visit() {
         open("http://automationpractice.com/index.php");
+        waitForDocumentCompleteState();
     }
 
     public void searchFor(String searchQuery) {
-        $(searchBox, CLICKABLE).clear();
-        $(searchBox).sendKeys(searchQuery);
-
-        //$$(tips, 5);
+        setValue(searchBox, searchQuery);
     }
 
     public String getFirstTipText() {

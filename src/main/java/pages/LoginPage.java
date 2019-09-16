@@ -15,9 +15,13 @@ public class LoginPage extends BasePage {
 	}
 
 	public void logIn(String email, String pwd) {
-		$(By.id("email")).sendKeys(email);
-		$(By.id("passwd")).sendKeys(pwd);
-		$(By.id("SubmitLogin")).click();
+		setValue(By.id("email"), email);
+		setValue(By.id("passwd"), pwd);
+		clickOn(By.id("SubmitLogin"));
 		waitForDocumentCompleteState();
+	}
+
+	public String getErrorMessage() {
+		return $("//*[@id=\"center_column\"]/div[1]/ol/li").getText();
 	}
 }
