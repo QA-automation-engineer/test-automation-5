@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -34,11 +36,13 @@ public abstract class BaseGUITest extends SimpleAPI {
 
 	private static final Logger LOGGER = LogManager.getLogger(BaseGUITest.class);
 
-	protected static WebDriver driver;
+	private WebDriver driver;
 
 	@Override
 	protected WebDriver getDriver() {
-		return driver;
+		return Optional.ofNullable(driver).orElseThrow(
+				() -> new RuntimeException("WebDriver wasn't initialized")
+		);
 	}
 
 	@Rule
@@ -76,7 +80,9 @@ public abstract class BaseGUITest extends SimpleAPI {
 				try {
 					driver = new RemoteWebDriver(new URL(seleniumUrl), desiredCapabilities);
 				} catch (MalformedURLException e) {
-					throw new RuntimeException("Unable to instantiate remote WebDriver:" + e.getMessage());
+					throw new RuntimeException("Unable to instantiate remote WebDriver due to incorrect hub-url: " + e.getMessage());
+				} catch (UnreachableBrowserException e) {
+					throw new RuntimeException("Unable to instantiate remote WebDriver: " + e.getMessage());
 				}
 			} else {
 				switch (browser) {
@@ -106,7 +112,7 @@ public abstract class BaseGUITest extends SimpleAPI {
 
 		@Override
 		protected void finished(Description description) {
-			driver.quit();
+			Optional.ofNullable(driver).ifPresent(d -> d.quit());
 			driver = null;
 			LOGGER.debug("WebDriver has been shut down.");
 			super.finished(description);

@@ -17,7 +17,7 @@ public class LoginTest extends BaseGUITest {
 
 	@Before
 	public void openLoginPage(){
-		loginPage = new LoginPage(driver);
+		loginPage = new LoginPage(getDriver());
 		loginPage.visit();
 	}
 

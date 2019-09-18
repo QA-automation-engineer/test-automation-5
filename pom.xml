@@ -71,7 +71,7 @@
                     <systemPropertyVariables>
                         <report.path>./reports/build-${timestamp}</report.path>
                         <selenium.url>http://localhost:4444/wd/hub</selenium.url>
-                        <browser>Firefox</browser>
+                        <browser>Chrome</browser>
                     </systemPropertyVariables>
                 </configuration>
                 <dependencies>
