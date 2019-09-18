@@ -18,11 +18,15 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
+import utils.Browser;
 import utils.EventHandler;
 import utils.SimpleAPI;
 
@@ -63,30 +67,40 @@ public abstract class BaseGUITest extends SimpleAPI {
 		@Override
 		protected void starting(Description description) {
 			LOGGER.info("Test '{}' - is starting...", descriptionToReadableFormat(description));
-			if (driver == null) {
-				final String seleniumUrl = System.getProperty("selenium.url");
-				if (seleniumUrl != null) {
-					DesiredCapabilities caps = DesiredCapabilities.chrome();
-					try {
-						driver = new RemoteWebDriver(new URL(seleniumUrl), caps);
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					}
-				} else {
-					driver = new ChromeDriver();
-				}
-				if (driver == null){
-					throw new RuntimeException("WebDriver wasn't instantiated.");
-				}
-				EventFiringWebDriver wd = new EventFiringWebDriver(driver);
-				wd.register(new EventHandler());
 
-				driver = wd;
-				LOGGER.debug("WebDriver has been started");
-				driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
-				driver.manage().window().setPosition(new Point(0,0));
-				driver.manage().window().setSize(new Dimension(1920,1080));
+			final Browser browser = Browser.getCurrentBrowser();
+			final DesiredCapabilities desiredCapabilities = initCaps(browser);
+			final String seleniumUrl = System.getProperty("selenium.url");
+
+			if (seleniumUrl != null) {
+				try {
+					driver = new RemoteWebDriver(new URL(seleniumUrl), desiredCapabilities);
+				} catch (MalformedURLException e) {
+					throw new RuntimeException("Unable to instantiate remote WebDriver:" + e.getMessage());
+				}
+			} else {
+				switch (browser) {
+				case CHROME:
+					final ChromeOptions chromeOptions = new ChromeOptions();
+					driver = new ChromeDriver(chromeOptions.merge(desiredCapabilities));
+					break;
+				case FIREFOX:
+					final FirefoxOptions firefoxOptions = new FirefoxOptions(desiredCapabilities);
+					driver = new FirefoxDriver(firefoxOptions);
+					break;
+				default:
+					throw new RuntimeException(
+							browser.name() + " initialization is not implemented. Try Chrome or Firefox");
+				}
 			}
+			EventFiringWebDriver wd = new EventFiringWebDriver(driver);
+			wd.register(new EventHandler());
+
+			driver = wd;
+			LOGGER.debug("WebDriver has been started");
+			driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
+			driver.manage().window().setPosition(new Point(0, 0));
+			driver.manage().window().setSize(new Dimension(1920, 1080));
 			super.starting(description);
 		}
 
@@ -98,6 +112,21 @@ public abstract class BaseGUITest extends SimpleAPI {
 			super.finished(description);
 		}
 	};
+
+	private DesiredCapabilities initCaps(Browser browser) {
+		DesiredCapabilities desiredCapabilities;
+		switch (browser) {
+		case CHROME:
+			desiredCapabilities = DesiredCapabilities.chrome();
+			break;
+		case FIREFOX:
+			desiredCapabilities = DesiredCapabilities.firefox();
+			break;
+		default:
+			throw new RuntimeException(browser + " browser is not expected");
+		}
+		return desiredCapabilities;
+	}
 
 	private String descriptionToReadableFormat(Description description){
 		return description.getMethodName().replace("_", " ");
