@@ -100,7 +100,7 @@ public abstract class SimpleAPI {
     }
 
     protected <T> T waitFor(ExpectedCondition<T> condition) {
-        return waitFor(condition, 10l);
+        return waitFor(condition, 30l);
     }
 
     protected void waitForDocumentCompleteState() {
